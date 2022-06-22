@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
+export ZSH="~/.oh-my-zsh"
 
 # Themes
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
@@ -12,9 +12,9 @@ source $ZSH/oh-my-zsh.sh
 
 # Personal Stuff
 
-export PATH=$HOME/.dotfiles/bin:$PATH
-source "$HOME/.dotfiles/config/env.zsh"
-source "$HOME/.dotfiles/config/aliases.zsh"
+export PATH=~/.dotfiles/bin:$PATH
+source "~/.dotfiles/config/env.zsh"
+source "~/.dotfiles/config/aliases.zsh"
 
 #if [[ "$(uname -s)" == 'Linux' ]]; then
 #  source "$ZDOTDIR/linux.zsh"
