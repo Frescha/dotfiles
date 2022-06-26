@@ -13,8 +13,8 @@ source $ZSH/oh-my-zsh.sh
 # Personal Stuff
 
 export PATH=~/.dotfiles/bin:$PATH
-source "~/.dotfiles/config/env.zsh"
-source "~/.dotfiles/config/aliases.zsh"
+source "~/.dotfiles/linux_mac/zshrc/config/env.zsh"
+source "~/.dotfiles/linux_mac/zshrc/config/aliases.zsh"
 
 #if [[ "$(uname -s)" == 'Linux' ]]; then
 #  source "$ZDOTDIR/linux.zsh"
