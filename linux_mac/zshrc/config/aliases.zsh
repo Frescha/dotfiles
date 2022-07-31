@@ -8,6 +8,6 @@ alias 5..='cd ../../../../..'
 alias q='exit'
 
 alias sudp='sudo'
-alias please='sudo'
+alias fuckit='sudo'
 #repeat last command
 alias please='sudo $(fc -ln -1)'
