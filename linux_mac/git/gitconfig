@@ -1,9 +1,40 @@
 # it's a me
+
+[user]
+        name = Andreas Karfusehr
+        email = frescha@unitedseed.de
+        # https://docs.gitlab.com/ee/user/project/repository/gpg_signed_commits/
+        #signingkey = 3BD9164122E5B50F
+
+[color]
+	diff = auto
+	status = auto
+	branch = auto
+        interactive = auto
+
 [filter "lfs"]
         required = true
         clean = git-lfs clean -- %f
         smudge = git-lfs smudge -- %f
         process = git-lfs filter-process
-[user]
-        name = Andreas Karfusehr
-        email = frescha@unitedseed.de
+
+[gpg]
+        program = gpg
+
+[alias]
+	ci = commit
+    cis = commit --sign #sign commits with gpg, if not activated by default
+	b = branch
+	br = branch
+	bc = branch-cleanup
+	r = remote
+	s = status
+	f = fetch
+	co = checkout
+	cp = cherry-pick
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+	lg2 = log --format='%Cgreen%h%Creset %C(cyan)%an%Creset - %s' --graph
+	today = !git log --since=midnight --author=\"$(git config user.name)\" --oneline
+	branch-cleanup = !git fetch origin --prune && git branch --merged master | grep -v 'master$' | xargs git branch -d
+	whatadded = log --diff-filter=A
+	undo = reset HEAD^
