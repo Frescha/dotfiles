@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# Get the system's local IP address (taken from <https://stackoverflow.com/a/25851186>).
+
+ip route get 1 | head -1 | cut -d ' ' -f7
