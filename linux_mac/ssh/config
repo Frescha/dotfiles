@@ -1,0 +1,21 @@
+# Global settings
+Host *
+    Protocol 2 
+# Protocol 1 well dodgy
+    Compression yes
+    ServerAliveCountMax 5  
+# Up to 5 pings with no reply before hang up
+    ServerAliveInterval 30 
+# Seconds. Needs to be <60s for some home routers
+# Don't offer all keys you can find... protects against compromised host
+# somewhat.
+    IdentitiesOnly yes
+# don't bounce keys through the service
+    ForwardAgent no
+
+# Local settings
+
+Host devops01
+  HostName devops01
+  User pirate
+  ForwardAgent yes
