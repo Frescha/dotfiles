@@ -1,0 +1,125 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Path: dotfiles/linux_mac/bin/rest.py
+
+import requests
+import argparse
+import flask
+
+class Rest:
+    def __init__(self) -> None:
+        pass
+
+
+    def run_server(self, args):
+        '''Starts a simple and basic server. All received requests are output.
+            Any endpoint and http method is accepted
+
+            Options:
+            * Debug mode: yes/no, default: no
+            * Server visibility: external/local only, default: local
+            * Server port: <custom>, default: 5000
+            
+            CLI Output:
+            * The received data but also the method will be output
+        '''
+        app = flask.Flask(__name__)
+        app.config['DEBUG'] = args.debug
+
+        @app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'PUT', 'DELETE'])
+        @app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+        def catch_all(path):
+            print('Method: {}'.format(flask.request.method))
+            print('Path: {}'.format(path))
+            print('Data: {}'.format(flask.request.data))
+            print('Headers: {}'.format(flask.request.headers))
+            return 'OK'
+
+        if args.debug is None:
+            args.debug = False
+        else:
+            args.debug = True
+
+        if args.port is None:
+            args.port = 5000
+        else:
+            args.port = int(args.port)
+
+        if args.visibility is None:
+            args.visibility = '127.0.0.1'
+        else:
+            args.visibility = '0.0.0.0'
+
+
+        app.run(debug=args.debug, host=args.visibility, port=args.port)
+
+
+    def send_request(self, args):
+        ''' Sends a request to the given url with the given data and headers.
+            The method can be specified, otherwise it will be a POST request.
+
+            Options:
+            * Method: POST/PUT/DELETE, default: POST
+            * URL: <custom>, default: http://localhost:5000
+            * Data: <custom>, default: None
+            
+            CLI Output:
+            * Output return code and return message if available
+        '''
+
+        if args.method is None:
+            args.method = 'POST'
+        else:
+            args.method = args.method.upper()
+
+        if args.url is None:
+            args.url = 'http://localhost:5000'
+
+        if args.data is None:
+            args.data = None
+
+        if args.headers is None:
+            args.headers = None
+
+        if args.method == 'POST':
+            response = requests.post(args.url, data=args.data, headers=args.headers)
+        elif args.method == 'PUT':
+            response = requests.put(args.url, data=args.data, headers=args.headers)
+        elif args.method == 'DELETE':
+            response = requests.delete(args.url, data=args.data, headers=args.headers)
+        else:
+            print('Method not supported')
+            return
+
+        print('Return code: {}'.format(response.status_code))
+        print('Return message: {}'.format(response.text))
+
+def main():
+    rest = Rest()
+
+    parser = argparse.ArgumentParser(description='Rest Cliet and Server script')
+    subparsers = parser.add_subparsers(dest='command', help='Commands to run', required=True)
+
+    client = subparsers.add_parser('client', help='Client to send requests')
+    client.add_argument('-m', '--method', help='Method to use')
+    client.add_argument('-u', '--url', help='URL to send the request to')
+    client.add_argument('-d', '--data', help='Data to send')
+    client.add_argument('-H', '--headers', help='Headers to send')
+
+    client.set_defaults(func=rest.send_request)
+
+    server = subparsers.add_parser('server', help='Server to receive any requests')
+    #bar.add_argument('context', help='context for bar')
+    server.add_argument('-d', '--debug', help='Debug mode')
+    server.add_argument('-v', '--visibility', help='Visibility of the server')
+    server.add_argument('-p', '--port', help='Port of the server')
+
+    server.set_defaults(func=rest.run_server)
+
+    args = parser.parse_args()
+    args.func(args)
+
+if __name__ == '__main__':
+  main()
+
+    
