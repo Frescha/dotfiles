@@ -94,10 +94,51 @@ class Rest:
         print('Return code: {}'.format(response.status_code))
         print('Return message: {}'.format(response.text))
 
+    def send_loop_requests(self, args):
+        ''' Sends a request to the given url with the given data. Payload can be
+            passed as a data string or via a file. The request will be sent
+            every x seconds.
+
+            Args:
+                url (str): Target URL
+                data (str): Data string (optional)
+                file (str): File path (optional)
+                interval (int): interval in seconds, default: 60s
+            
+            Returns:
+                int: Return code
+                str: Return message if available
+        '''
+            
+        if args.url is None:
+            args.url = 'http://localhost:5000'
+    
+        if args.interval is None:
+            args.interval = 60
+        else:
+            args.interval = int(args.interval)
+    
+        if args.data is None and args.file is None:
+            print('No data or file provided')
+            return
+    
+        if args.data is None:
+            with open(args.file, 'r') as f:
+                args.data = f.read()
+    
+        while True:
+            try:
+                response = requests.post(args.url, data=args.data)
+                print('Return code: {}'.format(response.status_code))
+                print('Return message: {}'.format(response.text))
+                time.sleep(args.interval)
+            except KeyboardInterrupt:
+                break
+
 def main():
     rest = Rest()
 
-    parser = argparse.ArgumentParser(description='Rest Cliet and Server script')
+    parser = argparse.ArgumentParser(description='Rest Client and Server script')
     subparsers = parser.add_subparsers(dest='command', help='Commands to run', required=True)
 
     client = subparsers.add_parser('client', help='Client to send requests')
@@ -105,15 +146,20 @@ def main():
     client.add_argument('-u', '--url', help='URL to send the request to')
     client.add_argument('-d', '--data', help='Data to send')
     client.add_argument('-H', '--headers', help='Headers to send')
-
     client.set_defaults(func=rest.send_request)
+
+    client_loop = subparsers.add_parser('client_loop', help='Client to send requests in a loop')
+    client_loop.add_argument('-u', '--url', help='URL to send the request to')
+    client_loop.add_argument('-d', '--data', help='Data to send')
+    client_loop.add_argument('-f', '--file', help='File to read data from')
+    client_loop.add_argument('-i', '--interval', help='Interval in seconds')
+    client_loop.set_defaults(func=rest.send_loop_requests)
 
     server = subparsers.add_parser('server', help='Server to receive any requests')
     #bar.add_argument('context', help='context for bar')
     server.add_argument('-d', '--debug', help='Debug mode')
     server.add_argument('-v', '--visibility', help='Visibility of the server')
     server.add_argument('-p', '--port', help='Port of the server')
-
     server.set_defaults(func=rest.run_server)
 
     args = parser.parse_args()
