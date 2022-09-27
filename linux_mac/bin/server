@@ -1,0 +1,81 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import socket
+import sys
+import argparse
+import logging
+
+from threading import Thread
+
+class Server:
+    def __init__(self) -> None:
+        pass
+
+
+def hexdump(data, length=16):
+    '''
+    Simple implementation of hexdump
+    https://gist.github.com/JonathonReinhart/509f9a8094177d050daa84efcd4486cb
+    '''
+    filter = ''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
+    lines = []
+    digits = 4 if isinstance(data, str) else 2
+    for c in range(0, len(data), length):
+        chars = data[c:c+length]
+        hex = ' '.join(["%0*x" % (digits, (x)) for x in chars])
+        printable = ''.join(["%s" % (((x) <= 127 and filter[(x)]) or '.') for x in chars])
+        lines.append("%04x  %-*s  %s\n" % (c, length*3, hex, printable))
+    print(''.join(lines))
+
+class Proxy(Thread):
+    '''It accepts UDP packets and forwards them to the desired IP
+       address and port. Just a proxy.'''
+
+    BUFFER_SIZE = 1024
+
+    def __init__(self) -> None:
+        pass
+
+    def run(self, args):
+        ''' Accepts UDP packets and forwards them to the given address. 
+
+            Args:
+                listen (str): listen ip address
+                listen_p (int): listen udp port
+                target (str): target ip address
+                target_p (int): target udp port
+            
+            Returns:
+                None
+        '''
+
+        # Create a UDP socket
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        # Bind the socket to the port
+        server_address = (args.listen, args.listen_p)
+        print('starting up on {} port {}'.format(*server_address))
+        sock.bind(server_address)
+
+        while True:
+            print('waiting to receive message')
+            data, address = sock.recvfrom(Proxy.BUFFER_SIZE)
+            print('received {} bytes from {}'.format(len(data), address))
+            print(data)
+            hexdump(data)
+
+
+def main():
+    proxy = Proxy()
+    parser = argparse.ArgumentParser(description='UDP Proxy')
+    parser.add_argument('--listen', type=str, help='Listen IP address', default='127.0.0.1')
+    parser.add_argument('--listen_p', type=int, help='Listen UDP port', default=5000)
+    parser.add_argument('--target', type=str, help='Target IP address', default='')
+    parser.add_argument('--target_p', type=int, help='Target UDP port', default=5000)
+    
+    args = parser.parse_args()
+    proxy.run(args)
+
+if __name__ == '__main__':
+  main()
