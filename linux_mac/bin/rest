@@ -6,6 +6,22 @@ import requests
 import argparse
 import flask
 
+class Http:
+    def __init__(self):
+        pass
+
+    def get(self, url, data=None, headers=None):
+        return requests.get(url, data=data, headers=headers)
+
+    def post(self, url, data=None, headers=None):
+        return requests.post(url, data=data, headers=headers)
+
+    def put(self, url, data=None, headers=None):
+        return requests.put(url, data=data, headers=headers)
+
+    def delete(self, url, data=None, headers=None):
+        return requests.delete(url, data=data, headers=headers)
+
 class Rest:
     def __init__(self) -> None:
         pass
@@ -129,9 +145,18 @@ class Rest:
         while True:
             try:
                 response = requests.post(args.url, data=args.data)
-                print('Return code: {}'.format(response.status_code))
-                print('Return message: {}'.format(response.text))
+                if response.status_code == 200:
+                    print('Return code: {}'.format(response.status_code))
+                    print('Return message: {}'.format(response.text))
+                if response.status_code == 418:
+                    print('Return code: {}'.format(response.status_code))
+                    pribt('A Tee pot answered')
+                else:
+                    print('Return code: {}'.format(response.status_code))
                 time.sleep(args.interval)
+            except requests.exceptions.RequestException as e:
+                raise SystemExit(f"{args.url}: is Not reachable \nErr: {e}")
+
             except KeyboardInterrupt:
                 break
 
@@ -156,7 +181,6 @@ def main():
     client_loop.set_defaults(func=rest.send_loop_requests)
 
     server = subparsers.add_parser('server', help='Server to receive any requests')
-    #bar.add_argument('context', help='context for bar')
     server.add_argument('-d', '--debug', help='Debug mode')
     server.add_argument('-v', '--visibility', help='Visibility of the server')
     server.add_argument('-p', '--port', help='Port of the server')
